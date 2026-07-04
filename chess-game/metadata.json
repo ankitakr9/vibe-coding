@@ -1,0 +1,6 @@
+{
+  "name": "Chess",
+  "description": "A professional and production-ready Chess game with an elegant, responsive interface, international rules, smart AI levels, and offline persistence.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
