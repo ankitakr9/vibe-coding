@@ -1,0 +1,6 @@
+{
+  "name": "Vedic Jyotish",
+  "description": "Premium Vedic Astrology and Horoscope platform powered by AI. Generate Janam Kundli, charts, panchang, match kundlis, and receive personalized astronomical predictions.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
