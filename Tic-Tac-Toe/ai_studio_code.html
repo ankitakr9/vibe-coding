@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Tic-Tac-Toe</title>
+    <style>
+        /* --- INDUSTRY STANDARDS: CSS Variables & Resets --- */
+        :root {
+            /* Theme 1: Midnight (Default) */
+            --bg-color: #0f172a;
+            --container-bg: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-x: #38bdf8;
+            --accent-o: #fb7185;
+            --cell-bg: #334155;
+            --cell-hover: #475569;
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+        }
+
+        /* Theme variants */
+        [data-theme="sakura"] {
+            --bg-color: #fff1f2;
+            --container-bg: #ffffff;
+            --text-primary: #881337;
+            --text-secondary: #fb7185;
+            --accent-x: #ec4899;
+            --accent-o: #f43f5e;
+            --cell-bg: #ffe4e6;
+            --cell-hover: #fecdd3;
+        }
+
+        [data-theme="forest"] {
+            --bg-color: #064e3b;
+            --container-bg: #065f46;
+            --text-primary: #ecfdf5;
+            --text-secondary: #a7f3d0;
+            --accent-x: #fbbf24;
+            --accent-o: #34d399;
+            --cell-bg: #047857;
+            --cell-hover: #059669;
+        }
+
+        [data-theme="cyberpunk"] {
+            --bg-color: #000000;
+            --container-bg: #0a0a0a;
+            --text-primary: #00ff41;
+            --text-secondary: #008f11;
+            --accent-x: #ff003c;
+            --accent-o: #00f3ff;
+            --cell-bg: #1a1a1a;
+            --cell-hover: #333333;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            transition: var(--transition);
+        }
+
+        .game-container {
+            background-color: var(--container-bg);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+        }
+
+        /* --- UI Elements --- */
+        .controls {
+            margin-bottom: 1.5rem;
+            display: grid;
+            gap: 1rem;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        select, button {
+            padding: 0.6rem;
+            border-radius: 6px;
+            border: 1px solid var(--cell-bg);
+            background: var(--cell-bg);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        select:hover, button:hover { background: var(--cell-hover); }
+
+        .status-display {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 1rem 0;
+            min-height: 1.5rem;
+        }
+
+        /* --- Game Board Grid --- */
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 1.5rem auto;
+            aspect-ratio: 1/1;
+        }
+
+        .cell {
+            background-color: var(--cell-bg);
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+            user-select: none;
+        }
+
+        .cell.taken { cursor: default; }
+        .cell:not(.taken):hover { background-color: var(--cell-hover); }
+
+        .cell[data-symbol="X"] { color: var(--accent-x); }
+        .cell[data-symbol="O"] { color: var(--accent-o); }
+
+        .reset-btn {
+            width: 100%;
+            margin-top: 1rem;
+            font-weight: bold;
+            background: var(--accent-x);
+            color: var(--bg-color);
+            border: none;
+        }
+
+        .reset-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+        /* Animation for thinking state */
+        .thinking { opacity: 0.6; pointer-events: none; }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <h1>Tic-Tac-Toe</h1>
+    
+    <div class="status-display" id="status">Player X's Turn</div>
+
+    <div class="controls">
+        <div class="control-group">
+            <label>Theme</label>
+            <select id="themeSelect">
+                <option value="midnight">Midnight Dark</option>
+                <option value="sakura">Sakura Pastel</option>
+                <option value="forest">Emerald Forest</option>
+                <option value="cyberpunk">Cyberpunk Neon</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label>Mode</label>
+            <select id="modeSelect">
+                <option value="pvp">Player vs Player</option>
+                <option value="pvc">Player vs Computer</option>
+            </select>
+        </div>
+
+        <div class="control-group" id="difficultyGroup" style="display: none;">
+            <label>Difficulty</label>
+            <select id="difficultySelect">
+                <option value="easy">Easy (Random)</option>
+                <option value="medium">Medium (Smartish)</option>
+                <option value="hard">Impossible (Minimax)</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="board" id="board">
+        <div class="cell" data-index="0"></div>
+        <div class="cell" data-index="1"></div>
+        <div class="cell" data-index="2"></div>
+        <div class="cell" data-index="3"></div>
+        <div class="cell" data-index="4"></div>
+        <div class="cell" data-index="5"></div>
+        <div class="cell" data-index="6"></div>
+        <div class="cell" data-index="7"></div>
+        <div class="cell" data-index="8"></div>
+    </div>
+
+    <button class="reset-btn" id="resetBtn">Reset Game</button>
+</div>
+
+<script>
+    /* --- INDUSTRY STANDARD: MODULAR JAVASCRIPT --- */
+    
+    const GameBoard = (() => {
+        let board = ["", "", "", "", "", "", "", "", ""];
+        
+        const reset = () => board.fill("");
+        const getBoard = () => [...board];
+        const setMove = (index, symbol) => {
+            if (board[index] === "") {
+                board[index] = symbol;
+                return true;
+            }
+            return false;
+        };
+
+        const checkWinner = (currentBoard) => {
+            const winPatterns = [
+                [0,1,2], [3,4,5], [6,7,8], // Rows
+                [0,3,6], [1,4,7], [2,5,8], // Cols
+                [0,4,8], [2,4,6]           // Diagonals
+            ];
+
+            for (const pattern of winPatterns) {
+                const [a, b, c] = pattern;
+                if (currentBoard[a] && currentBoard[a] === currentBoard[b] && currentBoard[a] === currentBoard[c]) {
+                    return currentBoard[a];
+                }
+            }
+            return currentBoard.includes("") ? null : "draw";
+        };
+
+        return { reset, getBoard, setMove, checkWinner };
+    })();
+
+    const AIController = (() => {
+        const scores = { X: -10, O: 10, draw: 0 };
+
+        const minimax = (board, depth, isMaximizing) => {
+            let result = GameBoard.checkWinner(board);
+            if (result !== null) return scores[result];
+
+            if (isMaximizing) {
+                let bestScore = -Infinity;
+                for (let i = 0; i < 9; i++) {
+                    if (board[i] === "") {
+                        board[i] = "O";
+                        let score = minimax(board, depth + 1, false);
+                        board[i] = "";
+                        bestScore = Math.max(score, bestScore);
+                    }
+                }
+                return bestScore;
+            } else {
+                let bestScore = Infinity;
+                for (let i = 0; i < 9; i++) {
+                    if (board[i] === "") {
+                        board[i] = "X";
+                        let score = minimax(board, depth + 1, true);
+                        board[i] = "";
+                        bestScore = Math.min(score, bestScore);
+                    }
+                }
+                return bestScore;
+            }
+        };
+
+        const getBestMove = (board, difficulty) => {
+            // Difficulty logic: chance of playing non-optimally
+            const randomChance = Math.random();
+            if (difficulty === 'easy' && randomChance < 0.8) return getRandomMove(board);
+            if (difficulty === 'medium' && randomChance < 0.4) return getRandomMove(board);
+
+            let bestScore = -Infinity;
+            let move;
+            for (let i = 0; i < 9; i++) {
+                if (board[i] === "") {
+                    board[i] = "O";
+                    let score = minimax(board, 0, false);
+                    board[i] = "";
+                    if (score > bestScore) {
+                        bestScore = score;
+                        move = i;
+                    }
+                }
+            }
+            return move;
+        };
+
+        const getRandomMove = (board) => {
+            const available = board.map((val, idx) => val === "" ? idx : null).filter(val => val !== null);
+            return available[Math.floor(Math.random() * available.length)];
+        };
+
+        return { getBestMove };
+    })();
+
+    const UIController = (() => {
+        const cells = document.querySelectorAll('.cell');
+        const statusDisplay = document.getElementById('status');
+        const themeSelect = document.getElementById('themeSelect');
+        const modeSelect = document.getElementById('modeSelect');
+        const difficultyGroup = document.getElementById('difficultyGroup');
+        const boardEl = document.getElementById('board');
+
+        const updateBoard = (board) => {
+            cells.forEach((cell, i) => {
+                cell.textContent = board[i];
+                cell.setAttribute('data-symbol', board[i]);
+                cell.classList.toggle('taken', board[i] !== "");
+            });
+        };
+
+        const setStatus = (msg) => statusDisplay.textContent = msg;
+
+        const toggleThinking = (isThinking) => {
+            boardEl.classList.toggle('thinking', isThinking);
+            if (isThinking) setStatus("Computer is thinking...");
+        };
+
+        themeSelect.addEventListener('change', (e) => {
+            document.body.setAttribute('data-theme', e.target.value);
+        });
+
+        modeSelect.addEventListener('change', (e) => {
+            difficultyGroup.style.display = e.target.value === 'pvc' ? 'flex' : 'none';
+        });
+
+        return { updateBoard, setStatus, toggleThinking, cells };
+    })();
+
+    const GameController = (() => {
+        let currentPlayer = "X";
+        let isGameOver = false;
+
+        const handleCellClick = async (e) => {
+            const index = e.target.dataset.index;
+            const mode = document.getElementById('modeSelect').value;
+
+            if (isGameOver || !GameBoard.setMove(index, currentPlayer)) return;
+
+            UIController.updateBoard(GameBoard.getBoard());
+            checkState();
+
+            if (!isGameOver && mode === 'pvc' && currentPlayer === "O") {
+                await handleAIMove();
+            }
+        };
+
+        const handleAIMove = async () => {
+            UIController.toggleThinking(true);
+            const difficulty = document.getElementById('difficultySelect').value;
+            
+            // Artificial delay for realism (1 second)
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            const bestMove = AIController.getBestMove(GameBoard.getBoard(), difficulty);
+            GameBoard.setMove(bestMove, "O");
+            
+            UIController.updateBoard(GameBoard.getBoard());
+            UIController.toggleThinking(false);
+            checkState();
+        };
+
+        const checkState = () => {
+            const winner = GameBoard.checkWinner(GameBoard.getBoard());
+            
+            if (winner) {
+                isGameOver = true;
+                if (winner === "draw") {
+                    UIController.setStatus("It's a Draw!");
+                } else {
+                    UIController.setStatus(`Player ${winner} Wins!`);
+                }
+            } else {
+                currentPlayer = currentPlayer === "X" ? "O" : "X";
+                UIController.setStatus(`Player ${currentPlayer}'s Turn`);
+            }
+        };
+
+        const reset = () => {
+            GameBoard.reset();
+            currentPlayer = "X";
+            isGameOver = false;
+            UIController.updateBoard(GameBoard.getBoard());
+            UIController.setStatus("Player X's Turn");
+            UIController.toggleThinking(false);
+        };
+
+        // Initialize
+        UIController.cells.forEach(cell => cell.addEventListener('click', handleCellClick));
+        document.getElementById('resetBtn').addEventListener('click', reset);
+        document.getElementById('modeSelect').addEventListener('change', reset);
+        
+    })();
+</script>
+
+</body>
+</html>
