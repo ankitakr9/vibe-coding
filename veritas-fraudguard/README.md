@@ -1,20 +1,93 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# 🛡️ Veritas FraudGuard
 
-# Run and deploy your AI Studio app
+### AI-Powered Fraud Detection & Monitoring Platform
 
-This contains everything you need to run your app locally.
+Veritas FraudGuard is a fraud monitoring application designed to help identify suspicious activities, monitor transaction alerts, and manage fraud detection rules through a centralized dashboard.
 
-View your app in AI Studio: https://ai.studio/apps/3db663f9-f85e-48c0-b52c-0ff501ae8a39
+## 🚀 Key Features
 
-## Run Locally
+- **Dashboard:** Centralized overview of fraud monitoring activities.
+- **Fraud Alerts:** View and manage suspicious transaction alerts.
+- **Rules Engine:** Manage fraud detection rules.
+- **Admin Management:** Manage users and access permissions.
+- **Authentication:** User authentication and access verification.
+- **Real-Time Monitoring:** Fraud activity monitoring interface.
 
-**Prerequisites:**  Node.js
+## 🛠️ Technology Stack
 
+- React.js
+- TypeScript
+- Vite
+- Node.js
+- Gemini API
+- CSS
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## 📂 Project Structure
+
+```text
+veritas-fraudguard/
+│
+├── src/
+│   ├── components/
+│   ├── hooks/
+│   ├── server/
+│   └── shared/
+│
+├── .env.example
+├── .gitignore
+├── index.html
+├── package.json
+├── server.ts
+├── tsconfig.json
+└── vite.config.ts
+```
+
+## ⚙️ Installation & Setup
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/ankitakr9/vibe-coding.git
+```
+
+### 2. Navigate to the project
+
+```bash
+cd vibe-coding/veritas-fraudguard
+```
+
+### 3. Install dependencies
+
+```bash
+npm install
+```
+
+### 4. Configure environment variables
+
+Create a `.env.local` file and configure your Gemini API key if required by the application.
+
+```env
+GEMINI_API_KEY=your_gemini_api_key
+```
+
+Never commit your actual API key to GitHub.
+
+### 5. Run the application
+
+```bash
+npm run dev
+```
+
+## 🎯 Project Objective
+
+The objective of Veritas FraudGuard is to provide a centralized platform for fraud monitoring, suspicious activity management, and rule-based fraud detection.
+
+## 👩‍💻 Developer
+
+**Ankita Kumari**
+
+GitHub: [@ankitakr9](https://github.com/ankitakr9)
+
+---
+
+⭐ If you find this project interesting, consider giving it a star!
