@@ -1,0 +1,6 @@
+{
+  "name": "Veritas FraudGuard",
+  "description": "Full-stack bank fraud detection and unauthorized user monitoring platform with real-time WebSocket alerts, risk scoring engine, and exportable Java Spring Boot project.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
