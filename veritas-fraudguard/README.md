@@ -1,5 +1,5 @@
 # 🛡️ Veritas FraudGuard
-
+[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge)](https://veritas-fraudguard.ai.studio/)
 ### AI-Powered Fraud Detection & Monitoring Platform
 
 Veritas FraudGuard is a fraud monitoring application designed to help identify suspicious activities, monitor transaction alerts, and manage fraud detection rules through a centralized dashboard.
