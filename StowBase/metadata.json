@@ -1,0 +1,8 @@
+{
+  "name": "StowBase",
+  "description": "Real-time personal inventory management powered by PostgreSQL, with storage locations, stock thresholds, and movement tracking.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

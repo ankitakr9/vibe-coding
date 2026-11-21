@@ -1,0 +1,21 @@
+server:
+  port: ${PORT:8080}
+
+spring:
+  application:
+    name: stowbase-inventory-backend
+  datasource:
+    url: jdbc:postgresql://${SQL_HOST:localhost}:5432/${SQL_DB_NAME:postgres}
+    username: ${SQL_USER:postgres}
+    password: ${SQL_PASSWORD:}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+
+firebase:
+  project-id: ${FIREBASE_PROJECT_ID:}
