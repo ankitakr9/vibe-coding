@@ -1,0 +1,6 @@
+{
+  "name": "LumenIndex — Full-Text Search Engine",
+  "description": "An inverted-index full-text search engine with Okapi BM25 ranking, web page & document indexing, persistent user search history, and an admin content management console.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
