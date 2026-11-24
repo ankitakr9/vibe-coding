@@ -22,6 +22,7 @@ I use **Google AI Studio (Gemini)** as an AI coding assistant to accelerate deve
 - Understand application architecture, REST APIs, and database design.
 - Explore relational and NoSQL databases.
 - Learn full-text search and indexing concepts.
+- Develop interactive applications and banking workflows.
 - Improve prompt engineering, debugging, and problem-solving skills.
 - Practice AI-assisted development while maintaining code understanding.
 - Learn by building, experimenting, and continuously improving.
@@ -39,9 +40,10 @@ Here are the projects currently available in this repository.
 | 03 | [Chess Game](./chess-game) | Interactive chess game exploring game logic and application development. | To be updated | 🚧 |
 | 04 | [Vedic Jyotish](./vedic-jyotish) | Application exploring Vedic astrology concepts and digital experiences. | To be updated | 🚧 |
 | 05 | [StowBase](./StowBase) | Full-stack personal inventory management system with real-time tracking, authentication, and PostgreSQL database integration. | React, TypeScript, Express, Drizzle ORM, PostgreSQL, Java 21, Spring Boot | ✅ |
-| 06 | [LumenIndex](./LumenIndex) | Full-text search engine for indexing and retrieving web pages and documents with relevance-based ranking. | Java, Spring Boot, MySQL, Apache Lucene, Thymeleaf, Spring Security | 🚧 |
+| 06 | [LumenIndex](./lumenindex) | Full-text search engine for indexing and retrieving web pages and documents with relevance-based ranking. | Java, Spring Boot, MySQL, Apache Lucene, Thymeleaf, Spring Security | 🚧 |
+| 07 | [Alder Bank – Banking Application](./banking-application) | Interactive banking dashboard featuring account management, deposits, withdrawals, fund transfers, and transaction history. | React, TypeScript, Vite, Node.js | 🚧 |
 
-**🎯 Target: 18+ Projects | Currently: 6 Projects | Remaining: 12+**
+**🎯 Target: 18+ Projects | Currently: 7 Projects | Remaining: 11+**
 
 More projects will be added as I continue exploring new technologies and development concepts.
 
@@ -86,6 +88,7 @@ This repository is not restricted to a single technology stack. Each project is 
 - Responsive Web Design
 - Lucide Icons
 - Thymeleaf
+- Vite
 
 ### 🗄️ Database & Data Management
 
@@ -125,6 +128,16 @@ This repository is not restricted to a single technology stack. Each project is 
 - Phrase Matching
 - Boolean Search Operators
 - Relevance-Based Ranking
+
+### 🏦 Banking Application Development
+
+- Account Management
+- Deposit and Withdrawal Operations
+- Fund Transfers
+- Transaction History
+- Balance Management
+- Financial Dashboard UI
+- Application State Management
 
 ### 🤖 AI & Modern Development
 
@@ -188,9 +201,17 @@ vibe-coding/
 ├── StowBase/
 │   └── README.md
 │
-├── LumenIndex/
+├── lumenindex/
 │   ├── docs/
 │   │   └── screenshots/
+│   └── README.md
+│
+├── banking-application/
+│   ├── docs/
+│   │   └── screenshots/
+│   │       ├── dashboard.png
+│   │       └── transactions.png
+│   ├── src/
 │   └── README.md
 │
 └── README.md
@@ -210,42 +231,4 @@ Each project has its own directory and README file containing its overview, feat
 | Database | MySQL, PostgreSQL, MongoDB |
 | ORM & Persistence | Hibernate, JPA, Drizzle ORM |
 | API Development | REST APIs, JWT, SSE |
-| Search Technologies | Apache Lucene, Inverted Indexing, BM25 |
-| AI Development | Gemini API, Prompt Engineering |
-| DevOps & Tools | Git, GitHub, Docker, Maven |
-| Software Practices | Debugging, Testing, Documentation |
-
----
-
-## 🌱 My Development Philosophy
-
-> AI can accelerate development, but understanding the code makes you a better developer.
-
-My objective is to build applications, explore different technology stacks, understand how things work internally, and develop the skills required to become a better software developer.
-
-I believe practical implementation, continuous experimentation, and problem-solving are essential parts of becoming a good developer.
-
-**Every project is an opportunity to learn something new.**
-
----
-
-## 👩‍💻 About Me
-
-**Ankita Kumari**
-
-Aspiring Java Full Stack Developer | Exploring Full-Stack Development | AI-Assisted Development Enthusiast
-
-I enjoy learning new technologies, solving problems, and building practical applications.
-
-Through this initiative, I aim to explore multiple development ecosystems, strengthen my software engineering fundamentals, and gain hands-on experience by building real-world applications.
-
-- GitHub: [@ankitakr9](https://github.com/ankitakr9)
-- Repository: [Vibe Coding](https://github.com/ankitakr9/vibe-coding)
-
----
-
-## ⭐ Support
-
-If you find my projects interesting, consider giving this repository a ⭐.
-
-**18+ Projects. Multiple Technologies. Continuous Learning. 🚀**
+| Search Technologies | Apache Lucene,
