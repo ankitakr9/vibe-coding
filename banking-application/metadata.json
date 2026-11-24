@@ -1,0 +1,6 @@
+{
+  "name": "Alder Bank — Simple Banking Application",
+  "description": "Personal banking application for account creation, authentication, deposits, withdrawals, transfers, interactive console mode, persistent file storage, and Core Java/JavaFX reference.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
