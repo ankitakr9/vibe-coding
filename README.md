@@ -23,6 +23,7 @@ I use **Google AI Studio (Gemini)** as an AI coding assistant to accelerate deve
 - Explore relational and NoSQL databases.
 - Learn full-text search and indexing concepts.
 - Develop interactive applications and banking workflows.
+- Explore real-world attendance management systems.
 - Improve prompt engineering, debugging, and problem-solving skills.
 - Practice AI-assisted development while maintaining code understanding.
 - Learn by building, experimenting, and continuously improving.
@@ -42,8 +43,9 @@ Here are the projects currently available in this repository.
 | 05 | [StowBase](./StowBase) | Full-stack personal inventory management system with real-time tracking, authentication, and PostgreSQL database integration. | React, TypeScript, Express, Drizzle ORM, PostgreSQL, Java 21, Spring Boot | ✅ |
 | 06 | [LumenIndex](./lumenindex) | Full-text search engine for indexing and retrieving web pages and documents with relevance-based ranking. | Java, Spring Boot, MySQL, Apache Lucene, Thymeleaf, Spring Security | 🚧 |
 | 07 | [Alder Bank – Banking Application](./banking-application) | Interactive banking dashboard featuring account management, deposits, withdrawals, fund transfers, and transaction history. | React, TypeScript, Vite, Node.js | 🚧 |
+| 08 | [RollCall – Attendance Management System](./RollCall) | Role-based attendance management platform with administrator, faculty, and student dashboards, attendance analytics, and CSV reporting. | React, TypeScript, Firebase, Firestore, Tailwind CSS, Vite | 🚧 |
 
-**🎯 Target: 18+ Projects | Currently: 7 Projects | Remaining: 11+**
+**🎯 Target: 18+ Projects | Currently: 8 Projects | Remaining: 10+**
 
 More projects will be added as I continue exploring new technologies and development concepts.
 
@@ -95,6 +97,8 @@ This repository is not restricted to a single technology stack. Each project is 
 - MySQL
 - PostgreSQL
 - MongoDB
+- Firebase
+- Cloud Firestore
 - Relational Database Design
 - Database Relationships
 - SQL Queries
@@ -112,11 +116,12 @@ This repository is not restricted to a single technology stack. Each project is 
 - REST API Development
 - JWT Authentication
 - Google Sign-In
+- Firebase Authentication
 - BCrypt Password Hashing
 - Server-Sent Events (SSE)
 - Dynamic Database Queries
-- API Integration
 - Spring Security
+- Role-Based Access Control
 
 ### 🔎 Search Engine Development
 
@@ -139,9 +144,22 @@ This repository is not restricted to a single technology stack. Each project is 
 - Financial Dashboard UI
 - Application State Management
 
+### 📋 Attendance Management Systems
+
+- Role-Based Access Control
+- Student and Faculty Management
+- Course Management
+- Daily Attendance Recording
+- Attendance Analytics
+- Attendance History
+- CSV Report Generation
+- Firebase Authentication
+- Firestore Security Rules
+
 ### 🤖 AI & Modern Development
 
 - Google AI Studio (Gemini)
+- Google GenAI SDK
 - AI API Integration
 - Prompt Engineering
 - AI-Assisted Coding
@@ -214,6 +232,9 @@ vibe-coding/
 │   ├── src/
 │   └── README.md
 │
+├── RollCall/
+│   └── README.md
+│
 └── README.md
 ```
 
@@ -228,7 +249,40 @@ Each project has its own directory and README file containing its overview, feat
 | Programming | Java, JavaScript, TypeScript |
 | Backend | Node.js, Express.js, Spring Boot |
 | Frontend | HTML, CSS, React, Tailwind CSS, Thymeleaf |
-| Database | MySQL, PostgreSQL, MongoDB |
+| Database | MySQL, PostgreSQL, MongoDB, Firebase, Firestore |
 | ORM & Persistence | Hibernate, JPA, Drizzle ORM |
+| Authentication & Security | JWT, Firebase Authentication, Spring Security |
 | API Development | REST APIs, JWT, SSE |
-| Search Technologies | Apache Lucene,
+| Search Technologies | Apache Lucene, Inverted Indexing, BM25 |
+| AI Development | Google Gemini, Google GenAI SDK, Prompt Engineering |
+| Tools | Git, GitHub, VS Code, Eclipse, Postman, Docker |
+
+---
+
+## 🌱 Continuous Improvement
+
+This repository represents my continuous learning journey through practical development.
+
+Every project helps me explore new technologies, understand real-world application requirements, improve problem-solving abilities, and gain hands-on experience with modern development workflows.
+
+My focus is not just on building applications, but also on understanding how they work.
+
+---
+
+## 👩‍💻 About Me
+
+**Ankita Kumari**
+
+Aspiring Java Full Stack Developer | AI-Assisted Development Enthusiast
+
+- GitHub: [@ankitakr9](https://github.com/ankitakr9)
+- Portfolio Repository: [Vibe Coding](https://github.com/ankitakr9/vibe-coding)
+
+---
+
+
+
+### 🚀 Explore. Build. Learn. Repeat.
+
+**One project at a time.**
+
