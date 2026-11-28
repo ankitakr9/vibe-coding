@@ -1,0 +1,447 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Safety Net: Default-deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // =========================================================================
+    // Core Primitives
+    // =========================================================================
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isOptionalId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]*$');
+    }
+
+    function isValidDateString(d) {
+      return d is string && d.size() == 10 && d.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$');
+    }
+
+    function isValidUidList(arr) {
+      return arr is list
+        && arr.size() <= 20
+        && (arr.size() == 0 || (arr[0] is string && arr[0].size() >= 1 && arr[0].size() <= 128));
+    }
+
+    // Bootstrapped Admin (zero DB reads, strictly requires verified email)
+    function isBootstrapAdmin() {
+      return isVerifiedUser() && request.auth.token.email == 'ak95349135@gmail.com';
+    }
+
+    // Role lookups from trusted /users/{uid} record (strictly non-list operations)
+    function hasUserDoc() {
+      return isSignedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function currentUserRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    function isAdmin() {
+      return isBootstrapAdmin() || (isVerifiedUser() && hasUserDoc() && currentUserRole() == 'admin');
+    }
+
+    function isFaculty() {
+      return isVerifiedUser() && hasUserDoc() && currentUserRole() == 'faculty';
+    }
+
+    // =========================================================================
+    // Entity Validation Blueprints (synchronized with firebase-blueprint.json)
+    // =========================================================================
+
+    function isValidUserAccount(data) {
+      return data.keys().hasAll([
+          'uid', 'displayName', 'role', 'department', 'memberCode', 'status', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'uid', 'displayName', 'role', 'department', 'memberCode', 'status', 'createdAt', 'updatedAt'
+        ])
+        && isValidId(data.uid)
+        && data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 100
+        && data.role in ['admin', 'faculty', 'student']
+        && data.department is string && data.department.size() <= 80
+        && data.memberCode is string && data.memberCode.size() <= 32 && data.memberCode.matches('^[a-zA-Z0-9_\\-]*$')
+        && data.status in ['active', 'inactive']
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidUserPrivateInfo(data) {
+      return data.keys().hasAll(['uid', 'email', 'phone', 'updatedAt'])
+        && data.keys().hasOnly(['uid', 'email', 'phone', 'updatedAt'])
+        && isValidId(data.uid)
+        && data.email is string && data.email.size() <= 160
+        && data.phone is string && data.phone.size() <= 30
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidRosterMember(data) {
+      return data.keys().hasAll([
+          'id', 'fullName', 'memberCode', 'role', 'department', 'batchOrTitle',
+          'status', 'linkedUid', 'assignedFacultyUids', 'createdBy', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'id', 'fullName', 'memberCode', 'role', 'department', 'batchOrTitle',
+          'status', 'linkedUid', 'assignedFacultyUids', 'createdBy', 'createdAt', 'updatedAt'
+        ])
+        && isValidId(data.id)
+        && data.fullName is string && data.fullName.size() >= 1 && data.fullName.size() <= 100
+        && data.memberCode is string && data.memberCode.size() >= 1 && data.memberCode.size() <= 32 && data.memberCode.matches('^[a-zA-Z0-9_\\-]+$')
+        && data.role in ['student', 'faculty']
+        && data.department is string && data.department.size() >= 1 && data.department.size() <= 80
+        && data.batchOrTitle is string && data.batchOrTitle.size() <= 80
+        && data.status in ['active', 'inactive']
+        && isOptionalId(data.linkedUid)
+        && isValidUidList(data.assignedFacultyUids)
+        && isValidId(data.createdBy)
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidRosterPrivateContact(data) {
+      return data.keys().hasAll(['memberId', 'email', 'phone', 'updatedAt'])
+        && data.keys().hasOnly(['memberId', 'email', 'phone', 'updatedAt'])
+        && isValidId(data.memberId)
+        && data.email is string && data.email.size() <= 160
+        && data.phone is string && data.phone.size() <= 30
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidCourse(data) {
+      return data.keys().hasAll([
+          'id', 'code', 'title', 'department', 'semester', 'schedule',
+          'facultyMemberId', 'facultyName', 'facultyUid', 'status',
+          'createdBy', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'id', 'code', 'title', 'department', 'semester', 'schedule',
+          'facultyMemberId', 'facultyName', 'facultyUid', 'status',
+          'createdBy', 'createdAt', 'updatedAt'
+        ])
+        && isValidId(data.id)
+        && data.code is string && data.code.size() >= 2 && data.code.size() <= 24 && data.code.matches('^[a-zA-Z0-9_\\- ]+$')
+        && data.title is string && data.title.size() >= 2 && data.title.size() <= 120
+        && data.department is string && data.department.size() >= 1 && data.department.size() <= 80
+        && data.semester is string && data.semester.size() >= 1 && data.semester.size() <= 40
+        && data.schedule is string && data.schedule.size() <= 80
+        && isOptionalId(data.facultyMemberId)
+        && data.facultyName is string && data.facultyName.size() <= 100
+        && isOptionalId(data.facultyUid)
+        && data.status in ['active', 'archived']
+        && isValidId(data.createdBy)
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidAttendanceRecord(data) {
+      return data.keys().hasAll([
+          'id', 'courseId', 'courseCode', 'courseTitle',
+          'studentMemberId', 'studentName', 'studentCode', 'studentUid',
+          'facultyUid', 'date', 'status', 'remarks',
+          'markedByUid', 'markedByName', 'locked', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'id', 'courseId', 'courseCode', 'courseTitle',
+          'studentMemberId', 'studentName', 'studentCode', 'studentUid',
+          'facultyUid', 'date', 'status', 'remarks',
+          'markedByUid', 'markedByName', 'locked', 'createdAt', 'updatedAt'
+        ])
+        && isValidId(data.id)
+        && isValidId(data.courseId)
+        && data.courseCode is string && data.courseCode.size() >= 1 && data.courseCode.size() <= 24
+        && data.courseTitle is string && data.courseTitle.size() >= 1 && data.courseTitle.size() <= 120
+        && isValidId(data.studentMemberId)
+        && data.studentName is string && data.studentName.size() >= 1 && data.studentName.size() <= 100
+        && data.studentCode is string && data.studentCode.size() >= 1 && data.studentCode.size() <= 32
+        && isOptionalId(data.studentUid)
+        && isOptionalId(data.facultyUid)
+        && isValidDateString(data.date)
+        && data.status in ['present', 'absent', 'late', 'excused']
+        && data.remarks is string && data.remarks.size() <= 300
+        && isValidId(data.markedByUid)
+        && data.markedByName is string && data.markedByName.size() >= 1 && data.markedByName.size() <= 100
+        && data.locked is bool
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    // =========================================================================
+    // Collection: /users/{userId}
+    // =========================================================================
+
+    match /users/{userId} {
+      allow get: if isValidId(userId) && (isOwner(userId) || isAdmin());
+      allow list: if isBootstrapAdmin() || (isSignedIn() && resource.data.uid == request.auth.uid);
+
+      allow create: if isVerifiedUser()
+        && isValidId(userId)
+        && isValidUserAccount(incoming())
+        && incoming().uid == userId
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time
+        && (
+          (isOwner(userId) && (
+            (isBootstrapAdmin() && incoming().role == 'admin' && incoming().status == 'active') ||
+            (!isBootstrapAdmin() && incoming().role == 'student' && incoming().status == 'active')
+          )) ||
+          isAdmin()
+        );
+
+      allow update: if isVerifiedUser()
+        && isValidId(userId)
+        && isValidUserAccount(incoming())
+        && incoming().uid == existing().uid
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && (
+          // Action: Admin role / account management
+          (isAdmin() && incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'role', 'department', 'memberCode', 'status', 'updatedAt'])) ||
+          // Action: Owner profile update (cannot alter role or status)
+          (isOwner(userId) && incoming().role == existing().role && incoming().status == existing().status
+            && incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'department', 'updatedAt']))
+        );
+
+      allow delete: if isValidId(userId) && isAdmin() && userId != request.auth.uid;
+
+      // Isolated PII subcollection: strictly Owner or Admin
+      match /private/{docId} {
+        allow get: if isValidId(userId) && docId == 'info' && (isOwner(userId) || isAdmin());
+        allow list: if false;
+
+        allow create: if isVerifiedUser()
+          && isValidId(userId)
+          && docId == 'info'
+          && isValidUserPrivateInfo(incoming())
+          && incoming().uid == userId
+          && incoming().updatedAt == request.time
+          && (isOwner(userId) || isAdmin());
+
+        allow update: if isVerifiedUser()
+          && isValidId(userId)
+          && docId == 'info'
+          && isValidUserPrivateInfo(incoming())
+          && incoming().uid == existing().uid
+          && incoming().updatedAt == request.time
+          && (
+            (isOwner(userId) && incoming().diff(existing()).affectedKeys().hasOnly(['email', 'phone', 'updatedAt'])) ||
+            (isAdmin() && incoming().diff(existing()).affectedKeys().hasOnly(['email', 'phone', 'updatedAt']))
+          );
+
+        allow delete: if isValidId(userId) && docId == 'info' && isAdmin();
+      }
+    }
+
+    // =========================================================================
+    // Collection: /roster/{memberId}
+    // =========================================================================
+
+    match /roster/{memberId} {
+      allow get: if isValidId(memberId) && (
+        isAdmin() ||
+        isFaculty() ||
+        (isSignedIn() && existing().linkedUid == request.auth.uid)
+      );
+
+      // Strictly scoped list query: zero get()/exists() calls; students only see own entry or active faculty
+      allow list: if isBootstrapAdmin() || (
+        isSignedIn() && (
+          resource.data.linkedUid == request.auth.uid ||
+          resource.data.createdBy == request.auth.uid ||
+          request.auth.uid in resource.data.assignedFacultyUids ||
+          (resource.data.role == 'faculty' && resource.data.status == 'active')
+        )
+      );
+
+      allow create: if isVerifiedUser()
+        && isValidId(memberId)
+        && isValidRosterMember(incoming())
+        && incoming().id == memberId
+        && incoming().createdBy == request.auth.uid
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time
+        && isAdmin();
+
+      allow update: if isVerifiedUser()
+        && isValidId(memberId)
+        && isValidRosterMember(incoming())
+        && incoming().id == existing().id
+        && incoming().createdBy == existing().createdBy
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && (
+          // Action: Admin updates member record
+          isAdmin() && incoming().diff(existing()).affectedKeys().hasOnly([
+            'fullName', 'memberCode', 'role', 'department', 'batchOrTitle',
+            'status', 'linkedUid', 'assignedFacultyUids', 'updatedAt'
+          ])
+        );
+
+      allow delete: if isValidId(memberId) && isAdmin();
+
+      // Admin-only contact PII for roster members
+      match /private/{docId} {
+        allow get: if isValidId(memberId) && docId == 'contact' && isAdmin();
+        allow list: if false;
+
+        allow create: if isVerifiedUser()
+          && isValidId(memberId)
+          && docId == 'contact'
+          && isValidRosterPrivateContact(incoming())
+          && incoming().memberId == memberId
+          && incoming().updatedAt == request.time
+          && isAdmin()
+          && exists(/databases/$(database)/documents/roster/$(memberId));
+
+        allow update: if isVerifiedUser()
+          && isValidId(memberId)
+          && docId == 'contact'
+          && isValidRosterPrivateContact(incoming())
+          && incoming().memberId == existing().memberId
+          && incoming().updatedAt == request.time
+          && isAdmin()
+          && incoming().diff(existing()).affectedKeys().hasOnly(['email', 'phone', 'updatedAt']);
+
+        allow delete: if isValidId(memberId) && docId == 'contact' && isAdmin();
+      }
+    }
+
+    // =========================================================================
+    // Collection: /courses/{courseId}
+    // =========================================================================
+
+    match /courses/{courseId} {
+      allow get: if isValidId(courseId) && (
+        isAdmin() ||
+        isFaculty() ||
+        (isSignedIn() && existing().status == 'active')
+      );
+
+      allow list: if isBootstrapAdmin() || (
+        isSignedIn() && (
+          resource.data.facultyUid == request.auth.uid ||
+          resource.data.createdBy == request.auth.uid ||
+          resource.data.status == 'active'
+        )
+      );
+
+      allow create: if isVerifiedUser()
+        && isValidId(courseId)
+        && isValidCourse(incoming())
+        && incoming().id == courseId
+        && incoming().createdBy == request.auth.uid
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time
+        && isAdmin();
+
+      allow update: if isVerifiedUser()
+        && isValidId(courseId)
+        && isValidCourse(incoming())
+        && incoming().id == existing().id
+        && incoming().createdBy == existing().createdBy
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && (
+          // Action: Admin updates course metadata
+          (isAdmin() && incoming().diff(existing()).affectedKeys().hasOnly([
+            'code', 'title', 'department', 'semester', 'schedule',
+            'facultyMemberId', 'facultyName', 'facultyUid', 'status', 'updatedAt'
+          ])) ||
+          // Action: Assigned faculty updates schedule on active course only
+          (isFaculty() && existing().facultyUid == request.auth.uid && existing().status == 'active'
+            && incoming().diff(existing()).affectedKeys().hasOnly(['schedule', 'updatedAt']))
+        );
+
+      allow delete: if isValidId(courseId) && isAdmin();
+    }
+
+    // =========================================================================
+    // Collection: /attendance/{recordId}
+    // =========================================================================
+
+    match /attendance/{recordId} {
+      allow get: if isValidId(recordId) && (
+        isAdmin() ||
+        (isFaculty() && existing().facultyUid == request.auth.uid) ||
+        (isSignedIn() && existing().studentUid == request.auth.uid)
+      );
+
+      allow list: if isBootstrapAdmin() || (
+        isSignedIn() && (
+          resource.data.studentUid == request.auth.uid ||
+          resource.data.facultyUid == request.auth.uid ||
+          resource.data.markedByUid == request.auth.uid
+        )
+      );
+
+      allow create: if isVerifiedUser()
+        && isValidId(recordId)
+        && isValidAttendanceRecord(incoming())
+        && incoming().id == recordId
+        && incoming().markedByUid == request.auth.uid
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time
+        && exists(/databases/$(database)/documents/courses/$(incoming().courseId))
+        && exists(/databases/$(database)/documents/roster/$(incoming().studentMemberId))
+        && (
+          isAdmin() ||
+          (isFaculty()
+            && incoming().locked == false
+            && incoming().facultyUid == request.auth.uid
+            && get(/databases/$(database)/documents/courses/$(incoming().courseId)).data.facultyUid == request.auth.uid)
+        );
+
+      allow update: if isVerifiedUser()
+        && isValidId(recordId)
+        && isValidAttendanceRecord(incoming())
+        && incoming().id == existing().id
+        && incoming().courseId == existing().courseId
+        && incoming().studentMemberId == existing().studentMemberId
+        && incoming().date == existing().date
+        && incoming().markedByUid == existing().markedByUid
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && (
+          // Action: Admin full override (including terminal lock/unlock and metadata sync)
+          (isAdmin() && incoming().diff(existing()).affectedKeys().hasOnly([
+            'status', 'remarks', 'locked', 'studentUid', 'facultyUid',
+            'studentName', 'studentCode', 'courseCode', 'courseTitle', 'markedByName', 'updatedAt'
+          ])) ||
+          // Action: Assigned faculty updates unlocked record status/remarks only
+          (isFaculty()
+            && existing().locked == false
+            && incoming().locked == false
+            && existing().facultyUid == request.auth.uid
+            && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'remarks', 'updatedAt']))
+        );
+
+      allow delete: if isValidId(recordId) && isAdmin();
+    }
+  }
+}

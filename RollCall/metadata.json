@@ -1,0 +1,6 @@
+{
+  "name": "RollCall — Attendance Management System",
+  "description": "Role-based academic and institutional attendance management system with Admin, Faculty, and Student modules backed by Firestore.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
